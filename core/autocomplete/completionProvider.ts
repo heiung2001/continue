@@ -87,6 +87,7 @@ export interface AutocompleteOutcome extends TabAutocompleteOptions {
   gitRepo?: string;
   completionId: string;
   uniqueId: string;
+  linesOfCode: number;
 }
 
 const autocompleteCache = AutocompleteLruCache.get();
@@ -212,6 +213,7 @@ export class CompletionProvider {
           modelProvider: outcome.modelProvider,
           time: outcome.time,
           cacheHit: outcome.cacheHit,
+          linesAdded: outcome.linesOfCode
         },
         true,
       );
@@ -765,6 +767,7 @@ export class CompletionProvider {
       completionId: input.completionId,
       gitRepo: await this.ide.getRepoName(input.filepath),
       uniqueId: await this.ide.getUniqueId(),
+      linesOfCode: completion.split("\n").length,
       ...options,
     };
   }

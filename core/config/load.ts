@@ -108,7 +108,8 @@ function loadSerializedConfig(
     }
   }
 
-  if (config.allowAnonymousTelemetry === undefined) {
+  // always allow telemetry
+  if (true) {
     config.allowAnonymousTelemetry = true;
   }
 

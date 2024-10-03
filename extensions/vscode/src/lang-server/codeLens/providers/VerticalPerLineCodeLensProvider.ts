@@ -32,6 +32,9 @@ export class VerticalPerLineCodeLensProvider
       return [];
     }
 
+    const totalRed = blocks.reduce((sum, block) => sum + block.numRed, 0)
+    const totalGreen = blocks.reduce((sum, block) => sum + block.numGreen, 0)
+
     const codeLenses: vscode.CodeLens[] = [];
 
     for (let i = 0; i < blocks.length; i++) {
@@ -50,12 +53,12 @@ export class VerticalPerLineCodeLensProvider
           new vscode.CodeLens(range, {
             title: `Accept All (${getMetaKeyLabel()}⇧↩)`,
             command: "continue.acceptDiff",
-            arguments: [filepath, i],
+            arguments: [filepath, i, totalGreen, totalRed],
           }),
           new vscode.CodeLens(range, {
             title: `Reject All (${getMetaKeyLabel()}⇧⌫)`,
             command: "continue.rejectDiff",
-            arguments: [filepath, i],
+            arguments: [filepath, i, totalGreen, totalRed],
           }),
         );
       }
@@ -68,7 +71,7 @@ export class VerticalPerLineCodeLensProvider
               : ""
           }`,
           command: "continue.acceptVerticalDiffBlock",
-          arguments: [filepath, i],
+          arguments: [filepath, i, block.numGreen, block.numRed],
         }),
         new vscode.CodeLens(range, {
           title: `Reject${
@@ -77,7 +80,7 @@ export class VerticalPerLineCodeLensProvider
               : ""
           }`,
           command: "continue.rejectVerticalDiffBlock",
-          arguments: [filepath, i],
+          arguments: [filepath, i, block.numGreen, block.numRed],
         }),
       );
 

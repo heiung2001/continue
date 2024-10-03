@@ -226,8 +226,8 @@ const commandsMap: (
   }
 
   return {
-    "continue.acceptDiff": async (newFilepath?: string | vscode.Uri) => {
-      captureCommandTelemetry("acceptDiff");
+    "continue.acceptDiff": async (newFilepath?: string | vscode.Uri, index?: number, numGreen?: number, numRed?: number) => {
+      captureCommandTelemetry("acceptDiff", {blockIndex: index, linesAdded: numGreen, linesRemoved:numRed});
 
       if (newFilepath instanceof vscode.Uri) {
         newFilepath = newFilepath.fsPath;
@@ -235,8 +235,8 @@ const commandsMap: (
       verticalDiffManager.clearForFilepath(newFilepath, true);
       await diffManager.acceptDiff(newFilepath);
     },
-    "continue.rejectDiff": async (newFilepath?: string | vscode.Uri) => {
-      captureCommandTelemetry("rejectDiff");
+    "continue.rejectDiff": async (newFilepath?: string | vscode.Uri, index?: number, numGreen?: number, numRed?: number) => {
+      captureCommandTelemetry("rejectDiff", {blockIndex: index, linesAdded: numGreen, linesRemoved: numRed});
 
       if (newFilepath instanceof vscode.Uri) {
         newFilepath = newFilepath.fsPath;
@@ -244,12 +244,12 @@ const commandsMap: (
       verticalDiffManager.clearForFilepath(newFilepath, false);
       await diffManager.rejectDiff(newFilepath);
     },
-    "continue.acceptVerticalDiffBlock": (filepath?: string, index?: number) => {
-      captureCommandTelemetry("acceptVerticalDiffBlock");
+    "continue.acceptVerticalDiffBlock": (filepath?: string, index?: number, numGreen?: number, numRed?: number) => {
+      captureCommandTelemetry("acceptVerticalDiffBlock", {blockIndex: index, linesAdded: numGreen, linesRemoved: numRed});
       verticalDiffManager.acceptRejectVerticalDiffBlock(true, filepath, index);
     },
-    "continue.rejectVerticalDiffBlock": (filepath?: string, index?: number) => {
-      captureCommandTelemetry("rejectVerticalDiffBlock");
+    "continue.rejectVerticalDiffBlock": (filepath?: string, index?: number, numGreen?: number, numRed?: number) => {
+      captureCommandTelemetry("rejectVerticalDiffBlock", {blockIndex: index, linesAdded: numGreen, linesRemoved: numRed});
       verticalDiffManager.acceptRejectVerticalDiffBlock(false, filepath, index);
     },
     "continue.quickFix": async (

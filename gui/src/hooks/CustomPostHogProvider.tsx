@@ -13,7 +13,7 @@ const CustomPostHogProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     if (allowAnonymousTelemetry) {
-      posthog.init("phc_JS6XFROuNbhJtVCEdTSYk6gl5ArRrTNMpCcguAXlSPs", {
+      posthog.init("phc_OdIcJ0UWlitsGPTLh29EaprsOnGMdEODlbz6KdUOrjm", {
         api_host: "https://app.posthog.com",
         disable_session_recording: true,
         autocapture: false,
