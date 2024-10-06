@@ -6,6 +6,7 @@ import * as vscode from "vscode";
 import { ContextMenuConfig, IDE } from "core";
 import { CompletionProvider } from "core/autocomplete/completionProvider";
 import { ConfigHandler } from "core/config/ConfigHandler";
+import { resolveSerializedConfig } from "core/config/load"
 import { ContinueServerClient } from "core/continueServer/stubs/client";
 import { Core } from "core/core";
 import { walkDirAsync } from "core/indexing/walkDir";
@@ -37,6 +38,11 @@ function getFullScreenTab() {
   return tabs.find((tab) =>
     (tab.input as any)?.viewType?.endsWith("continue.continueGUIView"),
   );
+}
+
+function getChatModelApiKey() {
+  const config = resolveSerializedConfig(getConfigJsonPath());
+  return config.models[0].apiKey?.slice(-4);
 }
 
 type TelemetryCaptureParams = Parameters<typeof Telemetry.capture>;
@@ -227,7 +233,8 @@ const commandsMap: (
 
   return {
     "continue.acceptDiff": async (newFilepath?: string | vscode.Uri, index?: number, numGreen?: number, numRed?: number) => {
-      captureCommandTelemetry("acceptDiff", {blockIndex: index, linesAdded: numGreen, linesRemoved:numRed});
+      const apiKey = getChatModelApiKey()
+      captureCommandTelemetry("acceptDiff", {blockIndex: index, linesAdded: numGreen, linesRemoved:numRed, apiKey: apiKey});
 
       if (newFilepath instanceof vscode.Uri) {
         newFilepath = newFilepath.fsPath;
@@ -236,7 +243,8 @@ const commandsMap: (
       await diffManager.acceptDiff(newFilepath);
     },
     "continue.rejectDiff": async (newFilepath?: string | vscode.Uri, index?: number, numGreen?: number, numRed?: number) => {
-      captureCommandTelemetry("rejectDiff", {blockIndex: index, linesAdded: numGreen, linesRemoved: numRed});
+      const apiKey = getChatModelApiKey()
+      captureCommandTelemetry("rejectDiff", {blockIndex: index, linesAdded: numGreen, linesRemoved: numRed, apiKey: apiKey});
 
       if (newFilepath instanceof vscode.Uri) {
         newFilepath = newFilepath.fsPath;
@@ -245,11 +253,13 @@ const commandsMap: (
       await diffManager.rejectDiff(newFilepath);
     },
     "continue.acceptVerticalDiffBlock": (filepath?: string, index?: number, numGreen?: number, numRed?: number) => {
-      captureCommandTelemetry("acceptVerticalDiffBlock", {blockIndex: index, linesAdded: numGreen, linesRemoved: numRed});
+      const apiKey = getChatModelApiKey()
+      captureCommandTelemetry("acceptVerticalDiffBlock", {blockIndex: index, linesAdded: numGreen, linesRemoved: numRed, apiKey: apiKey});
       verticalDiffManager.acceptRejectVerticalDiffBlock(true, filepath, index);
     },
     "continue.rejectVerticalDiffBlock": (filepath?: string, index?: number, numGreen?: number, numRed?: number) => {
-      captureCommandTelemetry("rejectVerticalDiffBlock", {blockIndex: index, linesAdded: numGreen, linesRemoved: numRed});
+      const apiKey = getChatModelApiKey()
+      captureCommandTelemetry("rejectVerticalDiffBlock", {blockIndex: index, linesAdded: numGreen, linesRemoved: numRed, apiKey: apiKey});
       verticalDiffManager.acceptRejectVerticalDiffBlock(false, filepath, index);
     },
     "continue.quickFix": async (

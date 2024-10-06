@@ -641,6 +641,7 @@ async function loadFullConfigNode(
 }
 
 export {
+  resolveSerializedConfig,
   finalToBrowserConfig,
   intermediateToFinalConfig,
   loadFullConfigNode,

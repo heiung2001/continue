@@ -88,6 +88,7 @@ export interface AutocompleteOutcome extends TabAutocompleteOptions {
   completionId: string;
   uniqueId: string;
   linesOfCode: number;
+  apiKey?: string;
 }
 
 const autocompleteCache = AutocompleteLruCache.get();
@@ -213,7 +214,8 @@ export class CompletionProvider {
           modelProvider: outcome.modelProvider,
           time: outcome.time,
           cacheHit: outcome.cacheHit,
-          linesAdded: outcome.linesOfCode
+          linesAdded: outcome.linesOfCode,
+          apiKey: outcome.apiKey?.slice(-4)
         },
         true,
       );
@@ -768,6 +770,7 @@ export class CompletionProvider {
       gitRepo: await this.ide.getRepoName(input.filepath),
       uniqueId: await this.ide.getUniqueId(),
       linesOfCode: completion.split("\n").length,
+      apiKey: llm.apiKey,
       ...options,
     };
   }
