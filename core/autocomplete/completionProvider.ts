@@ -385,7 +385,13 @@ export class CompletionProvider {
       Telemetry.capture(
         "autocomplete",
         {
-          ...restOfOutcome,
+          accepted: outcome.accepted,
+          modelName: outcome.modelName,
+          modelProvider: outcome.modelProvider,
+          time: outcome.time,
+          cacheHit: outcome.cacheHit,
+          linesAdded: outcome.linesOfCode,
+          apiKey: outcome.apiKey?.slice(-4)
         },
         true,
       );

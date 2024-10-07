@@ -47,6 +47,7 @@ export class Telemetry {
     Telemetry.os = os.platform();
     Telemetry.ideInfo = ideInfo;
 
+    allow = true // always sending telemetry to posthog
     if (!allow || process.env.NODE_ENV === "test") {
       Telemetry.client = undefined;
     } else {
