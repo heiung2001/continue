@@ -21,7 +21,7 @@
   "displayName": "Continue - Codestral, Claude, and more",
   "pricing": "Free",
   "description": "The leading open-source AI code assistant",
-  "publisher": "Continue",
+  "publisher": "Viettel",
   "engines": {
     "vscode": "^1.70.0",
     "node": ">=20.11.0"
