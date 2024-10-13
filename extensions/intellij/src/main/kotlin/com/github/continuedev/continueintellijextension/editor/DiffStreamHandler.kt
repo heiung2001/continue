@@ -46,6 +46,17 @@ class DiffStreamHandler(
     init {
         initUnfinishedRangeHighlights()
     }
+    
+    // tracking lines added\removed
+    private var linesAdded: Int = 0
+    private var linesRemoved: Int = 0
+
+    private fun removeDeletionInlays() {
+        deletionInlays.forEach {
+            it.dispose()
+        }
+        deletionInlays.clear()
+    }
 
     fun acceptAll() {
         editor.markupModel.removeAllHighlighters()
@@ -163,6 +174,7 @@ class DiffStreamHandler(
         curLine.diffBlock!!.addNewLine(text, curLine.index)
 
         curLine.index++
+        linesAdded++
     }
 
     private fun handleOldLine() {
@@ -171,6 +183,7 @@ class DiffStreamHandler(
         }
 
         curLine.diffBlock!!.deleteLineAt(curLine.index)
+        linesRemoved++
     }
 
     private fun updateProgressHighlighters(type: DiffLineType) {
@@ -230,6 +243,14 @@ class DiffStreamHandler(
 
     private fun getVirtualFile(): VirtualFile? {
         return FileDocumentManager.getInstance().getFile(editor.document) ?: return null
+    }
+
+    fun getLinesAdded(): Int {
+        return this.linesAdded
+    }
+
+    fun getLinesRemoved(): Int {
+        return this.linesRemoved
     }
 
     private fun createRequestParams(
