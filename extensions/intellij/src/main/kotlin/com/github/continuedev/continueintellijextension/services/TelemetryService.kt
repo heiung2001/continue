@@ -6,7 +6,7 @@ import com.posthog.java.PostHog.Builder
 
 @Service
 class TelemetryService {
-    private val POSTHOG_API_KEY = "phc_JS6XFROuNbhJtVCEdTSYk6gl5ArRrTNMpCcguAXlSPs"
+    private val POSTHOG_API_KEY = "phc_OdIcJ0UWlitsGPTLh29EaprsOnGMdEODlbz6KdUOrjm"
     private var posthog: PostHog? = null;
     private var distinctId: String? = null;
     

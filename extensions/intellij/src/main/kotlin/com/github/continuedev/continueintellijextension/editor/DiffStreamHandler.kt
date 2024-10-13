@@ -77,6 +77,10 @@ class DiffStreamHandler(
     private val deletionsBuffer: MutableList<String> = mutableListOf()
     private val deletionInlays: MutableList<Disposable> = mutableListOf()
 
+    // tracking lines added\removed
+    private var linesAdded: Int = 0
+    private var linesRemoved: Int = 0
+
     private fun removeDeletionInlays() {
         deletionInlays.forEach {
             it.dispose()
@@ -152,6 +156,7 @@ class DiffStreamHandler(
 
                     currentLine++
                     changeCount++
+                    linesAdded++
                 }
 
                 DiffLineType.OLD -> {
@@ -165,6 +170,7 @@ class DiffStreamHandler(
                     }
 
                     changeCount++
+                    linesRemoved++
                 }
             }
 
@@ -211,6 +217,14 @@ class DiffStreamHandler(
             currentLine = startLine
             changeCount = 0
         }
+    }
+
+    fun getLinesAdded(): Int {
+        return this.linesAdded
+    }
+
+    fun getLinesRemoved(): Int {
+        return this.linesRemoved
     }
 
     fun accept() {
