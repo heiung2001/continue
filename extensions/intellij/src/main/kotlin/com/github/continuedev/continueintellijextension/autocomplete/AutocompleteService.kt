@@ -16,6 +16,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
+import com.github.continuedev.continueintellijextension.services.TelemetryService
 
 data class PendingCompletion(
     val editor: Editor,
@@ -37,6 +38,7 @@ fun PsiElement.isInjectedText(): Boolean {
 class AutocompleteService(private val project: Project) {
     var pendingCompletion: PendingCompletion? = null;
     private val autocompleteLookupListener = project.service<AutocompleteLookupListener>()
+    private val telemetryService = service<TelemetryService>()
     private var widget: AutocompleteSpinnerWidget? = null
 
     // To avoid triggering another completion on partial acceptance,
@@ -192,6 +194,8 @@ class AutocompleteService(private val project: Project) {
 
         editor.caretModel.moveToOffset(offset + text.length)
 
+        val linesAdded: Int = text.count() { it == '\n'} + 1
+        this.telemetryService.capture("autocomplete", mapOf("accepted" to true, "linesAdded" to linesAdded))
 
         project.service<ContinuePluginService>().coreMessenger?.request(
             "autocomplete/accept",
@@ -254,6 +258,9 @@ class AutocompleteService(private val project: Project) {
     }
 
     private fun cancelCompletion(completion: PendingCompletion) {
+        val linesAdded: Int = completion.text!!.count() { it == '\n'} + 1
+        this.telemetryService.capture("autocomplete", mapOf("accepted" to false, "linesAdded" to linesAdded))
+
         // Send cancellation message to core
         widget?.setLoading(false)
         project.service<ContinuePluginService>().coreMessenger?.request("autocomplete/cancel", null, null, ({}))

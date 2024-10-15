@@ -67,7 +67,7 @@ class CoreMessengerManager(
       val allowAnonymousTelemetry = profileInfo?.get("allowAnonymousTelemetry") as? Boolean
       val telemetryService = service<TelemetryService>()
       if (allowAnonymousTelemetry == true || allowAnonymousTelemetry == null) {
-        telemetryService.setup(getMachineUniqueID())
+        telemetryService.setup(getMachineUniqueID(), ideProtocolClient)
       }
     }
 
