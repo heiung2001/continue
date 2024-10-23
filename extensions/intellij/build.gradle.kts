@@ -40,6 +40,7 @@ dependencies {
     }
     implementation("com.posthog.java:posthog:1.+")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    implementation("io.github.java-diff-utils:java-diff-utils:4.12")
 //    implementation("com.jetbrains.jsonSchema")
 }
 
