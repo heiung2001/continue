@@ -41,6 +41,7 @@ dependencies {
     implementation("com.posthog.java:posthog:1.+")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
     //    implementation("com.jetbrains.jsonSchema")
+    implementation("io.github.java-diff-utils:java-diff-utils:4.12")
 }
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for

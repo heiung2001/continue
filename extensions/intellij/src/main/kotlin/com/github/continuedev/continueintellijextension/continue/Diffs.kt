@@ -6,6 +6,12 @@ import com.intellij.diff.DiffContentFactory
 import com.intellij.diff.DiffManager
 import com.intellij.diff.DiffRequestPanel
 import com.intellij.diff.contents.DiffContent
+import com.intellij.diff.contents.DocumentContent
+import com.intellij.diff.requests.DiffRequest
+import com.github.difflib.DiffUtils
+import com.github.difflib.patch.Patch
+import com.github.difflib.patch.AbstractDelta
+import com.github.difflib.patch.DeltaType
 import com.intellij.diff.requests.SimpleDiffRequest
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction
@@ -21,7 +27,44 @@ import java.io.File
 import java.nio.file.Paths
 import javax.swing.Action
 import javax.swing.JComponent
+import com.intellij.openapi.components.service
+import com.github.continuedev.continueintellijextension.services.TelemetryService
 
+
+fun getDiffStats(oldFile: String, newFile: String):  Map<String, Int>{
+    // Storing values
+    var linesAdded: Int = 0
+    var linesRemoved: Int = 0
+
+    val oldFileContent: List<String> = File(oldFile).readLines()
+    val newFileContent: List<String> = File(newFile).readLines()
+
+    // Generate a patch that contains the changes between two versions
+    val patch: Patch<String> = DiffUtils.diff(oldFileContent, newFileContent)
+
+    for (delta: AbstractDelta<String> in patch.deltas) {
+        val deltaLinesRemoved = delta.source.lines.size
+        val deltaLinesAdded = delta.target.lines.size
+
+        when (delta.type) {
+            DeltaType.INSERT -> linesAdded += deltaLinesAdded
+
+            DeltaType.DELETE -> linesRemoved += deltaLinesRemoved
+
+            DeltaType.CHANGE -> {
+                linesAdded += deltaLinesAdded
+                linesRemoved += deltaLinesRemoved
+            }
+
+            DeltaType.EQUAL -> { }
+        }
+    }
+
+    return mapOf<String, Int>(
+            "linesAdded" to linesAdded,
+            "linesRemoved" to linesRemoved
+    )
+}
 
 fun getDiffDirectory(): File {
     val homeDirectory = System.getProperty("user.home")
@@ -51,6 +94,9 @@ class DiffManager(private val project: Project) : DumbAware {
     // Mapping from file2 to relevant info
     private val diffInfoMap: MutableMap<String, DiffInfo> = mutableMapOf()
     private var lastFile2: String? = null
+
+    // Init Telemetry service
+    private val telemetryService = service<TelemetryService>()
 
     fun showDiff(filepath: String, replacement: String, stepIndex: Int) {
         val diffDir = getDiffDirectory()
@@ -162,11 +208,36 @@ class DiffManager(private val project: Project) : DumbAware {
 
                         override fun doOKAction() {
                             super.doOKAction()
+
+                            // Get diff statistics
+                            val diffStatsMap = getDiffStats(file1, file2)
+
+                            //Push event to posthog
+                            telemetryService.capture(
+                                    "acceptDiff",
+                                    mapOf(
+                                            "linesAdded" to diffStatsMap["linesAdded"],
+                                            "linesRemoved" to diffStatsMap["linesRemoved"]
+                                    )
+                            )
                             acceptDiff(file2)
                         }
 
                         override fun doCancelAction() {
                             super.doCancelAction()
+
+                            // Get diff statistics
+                            val diffStatsMap = getDiffStats(file1, file2)
+
+                            // Push event to posthog
+                            telemetryService.capture(
+                                    "rejectDiff",
+                                    mapOf(
+                                            "linesAdded" to diffStatsMap["linesAdded"],
+                                            "linesRemoved" to diffStatsMap["linesRemoved"]
+                                    )
+                            )
+
                             rejectDiff(file2)
                         }
 
