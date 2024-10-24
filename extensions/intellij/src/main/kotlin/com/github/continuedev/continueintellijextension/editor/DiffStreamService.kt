@@ -21,7 +21,7 @@ class DiffStreamService {
 
     fun reject(editor: Editor) {
         this.telemetryService.capture(
-                "intellijRejectDiff",
+                "rejectDiff",
                 mapOf(
                         "linesAdded" to handlers[editor]?.getLinesAdded(),
                         "linesRemoved" to handlers[editor]?.getLinesRemoved(),
@@ -33,7 +33,7 @@ class DiffStreamService {
 
     fun accept(editor: Editor) {
         this.telemetryService.capture(
-                "intellijAcceptDiff",
+                "acceptDiff",
                 mapOf(
                         "linesAdded" to handlers[editor]?.getLinesAdded(),
                         "linesRemoved" to handlers[editor]?.getLinesRemoved()
