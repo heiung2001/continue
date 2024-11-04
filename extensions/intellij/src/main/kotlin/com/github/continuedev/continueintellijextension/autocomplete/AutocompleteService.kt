@@ -258,7 +258,7 @@ class AutocompleteService(private val project: Project) {
     }
 
     private fun cancelCompletion(completion: PendingCompletion) {
-        val linesAdded: Int = completion.text!!.count() { it == '\n'} + 1
+        val linesAdded: Int = completion.text?.count { it == '\n'}?.plus(1) ?: 1
         this.telemetryService.capture("autocomplete", mapOf("accepted" to false, "linesAdded" to linesAdded))
 
         // Send cancellation message to core
