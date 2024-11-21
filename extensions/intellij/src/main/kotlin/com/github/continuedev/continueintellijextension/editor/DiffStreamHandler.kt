@@ -46,17 +46,10 @@ class DiffStreamHandler(
     init {
         initUnfinishedRangeHighlights()
     }
-    
+
     // tracking lines added\removed
     private var linesAdded: Int = 0
     private var linesRemoved: Int = 0
-
-    private fun removeDeletionInlays() {
-        deletionInlays.forEach {
-            it.dispose()
-        }
-        deletionInlays.clear()
-    }
 
     fun acceptAll() {
         editor.markupModel.removeAllHighlighters()
@@ -150,7 +143,7 @@ class DiffStreamHandler(
         val diffBlock = VerticalDiffBlock(
             editor, project, curLine.index, ::handleDiffBlockAcceptOrReject
         )
-        
+
         diffBlocks.add(diffBlock)
 
         return diffBlock
