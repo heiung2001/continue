@@ -2,7 +2,13 @@ package com.github.continuedev.continueintellijextension.`continue`
 
 import com.github.continuedev.continueintellijextension.services.ContinuePluginService
 import com.github.continuedev.continueintellijextension.services.TelemetryService
+import com.intellij.ide.BrowserUtil
 import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.plugins.PluginManagerCore
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
+import com.intellij.notification.NotificationAction
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.extensions.PluginId
@@ -70,6 +76,60 @@ class CoreMessengerManager(
         telemetryService.setup(getMachineUniqueID(), ideProtocolClient)
       }
     }
+
+    val pluginId = "com.github.continuedev.continueintellijextension"
+    val plugin = PluginManagerCore.getPlugin(PluginId.getId(pluginId))
+    val extensionVersion = plugin?.version ?: "Unknown"
+
+    val osName = System.getProperty("os.name").toLowerCase()
+    val os =
+      when {
+        osName.contains("mac") || osName.contains("darwin") -> "darwin"
+        osName.contains("win") -> "win32"
+        osName.contains("nix") || osName.contains("nux") || osName.contains("aix") -> "linux"
+        else -> "linux"
+      }
+
+    coreMessenger?.request(
+      "version/getLatest",
+      mapOf(
+        "os" to os,
+        "ide" to "jetbrains",
+        "version" to extensionVersion,
+      ),
+      null,
+      ({ response ->
+        val isLatest = (response as? Map<*, *>)?.get("isLatest") as Boolean
+        val latestVersion = (response as? Map<*, *>)?.get("latestVersion") as String
+        val downloadLink = (response as? Map<*, *>)?.get("downloadLink") as String
+
+        if (!isLatest) {
+          val notification = Notification(
+            "Continue",
+            "CoDev update available.",
+            "Your current version is $extensionVersion but the latest version is $latestVersion",
+            NotificationType.INFORMATION
+          )
+
+          // Download action
+          notification.addAction(object : NotificationAction("Download") {
+            override fun actionPerformed(p0: AnActionEvent, p1: Notification) {
+              BrowserUtil.browse(downloadLink)
+              notification.expire()
+            }
+          })
+
+          // Ignore action
+          notification.addAction(object : NotificationAction("Ignore") {
+            override fun actionPerformed(p0: AnActionEvent, p1: Notification) {
+              notification.expire()
+            }
+          })
+
+          notification.notify(project)
+        }
+      })
+    )
 
     // On exit, use exponential backoff to create another CoreMessenger
     coreMessenger?.onDidExit {

@@ -707,6 +707,28 @@ export class Core {
     on("didChangeActiveTextEditor", ({ data: { filepath } }) => {
       recentlyEditedFilesCache.set(filepath, filepath);
     });
+
+    on("version/getLatest", async (msg) => {
+      const { os, ide, currentVersion } = msg.data;
+
+      try {
+        const url = `http://localhost:8000/api/version/ext/?ide=${ide}&os_name=${os}`;
+        const response = await fetchwithRequestOptions(url);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch version info: ${response.statusText}`);
+        };
+
+        const data: any = await response.json();
+        const { latest_version: latestVersion, download_link: downloadLink } = data;
+        const isLatest: boolean = currentVersion === latestVersion;
+        
+        return { isLatest: isLatest, latestVersion: latestVersion, downloadLink: downloadLink };
+      } catch(e) {
+        console.debug(`Error in verifying latest version: ${e}`);
+        return { isLatest: true, latestVersion: null, downloadLink: null };
+      }
+    });
   }
 
   private indexingCancellationController: AbortController | undefined;

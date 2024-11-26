@@ -158,4 +158,9 @@ export type ToCoreFromIdeOrWebviewProtocol = {
   "profiles/switch": [{ id: string }, undefined];
 
   "auth/getAuthUrl": [undefined, { url: string }];
+
+  "version/getLatest": [
+    { os: string, ide: string, currentVersion: string},
+    { isLatest: boolean, latestVersion: string | null, downloadLink: string | null}
+  ]
 };
