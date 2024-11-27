@@ -1,8 +1,8 @@
 {
-  "name": "continue",
+  "name": "codev",
   "icon": "media/icon.png",
   "author": "Continue Dev, Inc",
-  "version": "0.8.53",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/continuedev/continue"
@@ -18,9 +18,9 @@
   "homepage": "https://continue.dev",
   "qna": "https://github.com/continuedev/continue/issues/new/choose",
   "license": "Apache-2.0",
-  "displayName": "Continue - Codestral, Claude, and more",
+  "displayName": "CoDev - Your AI coding assistant",
   "pricing": "Free",
-  "description": "The leading open-source AI code assistant",
+  "description": "For better code maybe",
   "publisher": "Viettel",
   "engines": {
     "vscode": "^1.70.0",

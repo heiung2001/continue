@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 
-const ENCRYPTION_KEY_NAME = "dev.viettel.continue";
+const ENCRYPTION_KEY_NAME = "dev.viettel.codev";
 
 /**
  * vscode.SecretStorage is not reliable (often loads older values for a key)
