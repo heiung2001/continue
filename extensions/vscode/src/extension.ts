@@ -44,8 +44,11 @@ export async function activate(context: vscode.ExtensionContext) {
   let downloadLink: string | null = null;
 
   try {
-    const url = `http://10.30.132.71:10011/api/version/ext/?ide=${ide}&os_name=${os}`;
-    const response = await fetchwithRequestOptions(url);
+    const url = `http://localhost:8000/api/v1/version/ext/?ide=${ide}&os_name=${os}`;
+    const response = await fetchwithRequestOptions(
+      url,
+      { signal: AbortSignal.timeout(5000) },
+    );
     
     if (!response.ok) {
       throw new Error(`Failed to fetch version info: ${response.statusText}`);
